@@ -188,3 +188,24 @@ body::before {
   overflow: auto;
   flex: 1;
 }
+
+.win-resize{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  cursor: se-resize;
+  background: transparent;
+}
+
+.win-resize::after{
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid var(--border2);
+  border-bottom: 1.5px solid var(--border2);
+}

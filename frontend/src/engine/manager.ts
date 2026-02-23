@@ -1,11 +1,13 @@
 import type { WindowConfig, WindowManagerOptions, WindowState, WindowInstance } from './types';
 import { renderWindow, updateWindowDOM } from './renderer';
 import { DragHandler } from './drag';
+import { ResizeHandler } from './resize';
 
 // this class orchestrates the lifecycle, state, and z-index layering of window instances.
 export class WindowManager {
   private instances = new Map<string, WindowInstance>();
   private dragHandlers = new Map<string, DragHandler>();
+  private resizeHandlers = new Map<string, ResizeHandler>();
 
   private zTop: number;
   private container: HTMLElement;
@@ -36,6 +38,8 @@ export class WindowManager {
     const instance = this.get(id);
     this.dragHandlers.get(id)?.destroy();
     this.dragHandlers.delete(id);
+    this.resizeHandlers.get(id)?.destroy();
+    this.resizeHandlers.delete(id);
     instance.element.remove();
     this.instances.delete(id);
   }
@@ -78,7 +82,6 @@ export class WindowManager {
   }
 
   // binds core interactions including focus, action buttons, and dragging.
-  // TODO: add resize interaction
   private attachBehaviors(instance: WindowInstance): void {
     // global focus trigger on interaction
     instance.element.addEventListener('mousedown', () => this.focus(instance.config.id));
@@ -105,5 +108,15 @@ export class WindowManager {
         this.container
       )
     );
+
+    // resize
+    if (instance.config.resizable !== false) {
+      const resize = new ResizeHandler(instance, (size) => {
+        instance.state.size = size;
+        instance.element.style.width = size.width + 'px';
+        instance.element.style.height = size.height + 'px';
+      });
+      this.resizeHandlers.set(instance.config.id, resize);
+    }
   }
 }

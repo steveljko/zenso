@@ -14,6 +14,10 @@ export function renderWindow(config: WindowConfig, state: WindowState): HTMLElem
   win.appendChild(renderTitleBar(config));
   win.appendChild(renderBody(config));
 
+  if (config.resizable !== false) {
+    win.appendChild(renderResizeHandle());
+  }
+
   return win;
 }
 
@@ -84,6 +88,12 @@ function renderBody(config: WindowConfig): HTMLElement {
   }
 
   return body;
+}
+
+function renderResizeHandle(): HTMLElement {
+  const handle = document.createElement('div');
+  handle.className = 'win-resize';
+  return handle;
 }
 
 // updates existing dom nodes to reflect reactive changes in the window state object.
