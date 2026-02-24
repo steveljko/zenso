@@ -140,7 +140,6 @@ body::before {
 }
 
 .win-title {
-  font-family: 'DM Mono', monospace;
   font-size: 0.6rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -175,7 +174,6 @@ body::before {
   color: var(--mid);
   font-size: 0.7rem;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
-  font-family: 'DM Mono', monospace;
 }
 
 .win-btn:hover {
@@ -209,3 +207,228 @@ body::before {
   border-right: 1.5px solid var(--border2);
   border-bottom: 1.5px solid var(--border2);
 }
+
+/* TASKS */
+.tasks {
+  padding: 1.25rem 1.25rem 1rem 1.25rem;
+}
+
+.task-add {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border2);
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.task-add input {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 300;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--white);
+  caret-color: var(--accent);
+}
+
+.task-add input::placeholder {
+  color: var(--mid);
+}
+
+.task-add button {
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--mid);
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.task-add button:hover {
+  color: var(--accent);
+  border-color: var(--accent2);
+}
+
+.task-stats {
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 0.8rem;
+}
+
+.tasks ul {
+  list-style: none;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.tasks ul::-webkit-scrollbar {
+  width: 3px;
+}
+
+.tasks ul::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tasks ul::-webkit-scrollbar-thumb {
+  background: var(--border2);
+}
+
+/* Task item */
+.ti {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border);
+  animation: slideIn 0.15s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.ti-check {
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid var(--border2);
+  flex-shrink: 0;
+  position: relative;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+
+.ti.done .ti-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.ti.done .ti-check::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--surface);
+  clip-path: polygon(15% 50%, 40% 75%, 85% 20%, 100% 35%, 40% 95%, 0% 65%);
+}
+
+.ti-text {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 400;
+  transition: color 0.2s;
+}
+
+.ti.done .ti-text {
+  color: var(--mid);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.ti-time {
+  font-size: 0.58rem;
+  color: var(--mid);
+  white-space: nowrap;
+}
+
+.ti.active-task .ti-time {
+  color: var(--green);
+}
+
+.ti-start-btn {
+  background: none;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--mid);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.4rem;
+  height: 20px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.ti-start-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.ti.active-task .ti-start-btn {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.ti-del {
+  background: none;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--mid);
+  font-size: 0.75rem;
+  line-height: 1;
+  height: 20px;
+  padding: 0 0.35rem;
+  transition: color 0.15s;
+}
+
+.ti-del:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.task-empty {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mid);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.task-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+}
+
+.task-total_time {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  line-height: 1rem;
+  color: var(--mid);
+  text-transform: uppercase;
+}
+
+.task-total_time #time {
+  margin-left: 0.25rem;
+}
+
+.task-clear {
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  line-height: 1rem;
+  text-transform: uppercase;
+  color: var(--mid);
+  background: none;
+  border: 1px solid var(--dim);
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.task-clear:hover {
+  color: var(--red);
+}
+

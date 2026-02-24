@@ -1,5 +1,6 @@
 import { WindowManager } from './engine';
-import { registerTestWindow } from './windows/test';
+import { registerTasks } from './windows/tasks';
+import { createState } from './state';
 
 import './styles/main.css';
 
@@ -15,5 +16,6 @@ const wm = new WindowManager({
   container: document.getElementById('surface') ?? document.body,
 });
 
-registerTestWindow(wm);
-registerTestWindow(wm);
+const state = createState();
+
+registerTasks(wm, state);
