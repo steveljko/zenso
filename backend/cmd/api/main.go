@@ -3,26 +3,44 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+	"zenso/internal/config"
+	"zenso/internal/db"
 	"zenso/internal/handler"
+	"zenso/internal/store"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	godotenv.Load()
 
-	addr := os.Getenv("ADDR")
-	if addr == "" {
-		addr = ":8080"
+	cfg := config.Load()
+
+	dbConn, err := db.New(cfg.DB)
+	if err != nil {
+		log.Fatalf("database: %v", err)
+	}
+	defer dbConn.Close()
+
+	const migrationDir = "migrations/"
+	logger.Info("running database migrations")
+	if err = db.RunMigrations(dbConn, migrationDir); err != nil {
+		logger.Error("failed to run migrations")
 	}
 
 	srv := &http.Server{
-		Addr:         addr,
-		Handler:      routes(),
+		Addr:         fmt.Sprintf(":%s", cfg.Server.Port),
+		Handler:      routes(dbConn),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -45,7 +63,7 @@ func main() {
 
 	logger.Info("starting server", "addr", srv.Addr)
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
 		logger.Error("server error", "error", err)
 		os.Exit(1)
@@ -59,12 +77,18 @@ func main() {
 	logger.Info("server stopped")
 }
 
-func routes() http.Handler {
+// routes initializes the internal API router and wires up handlers with their dependencies.
+func routes(db *sqlx.DB) http.Handler {
 	healthHandler := handler.NewHealthHandler()
+
+	userStore := store.NewUserStore(db)
+	authHandler := handler.NewAuthHandler(userStore)
 
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /health", healthHandler.Get)
+
+	mux.HandleFunc("POST /register", authHandler.Register)
 
 	return mux
 }

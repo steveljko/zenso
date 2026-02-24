@@ -1,0 +1,6 @@
+# enviroment
+.env
+!.env.example
+
+# database
+*.sqlite*
