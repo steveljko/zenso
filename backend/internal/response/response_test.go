@@ -332,6 +332,37 @@ func TestInternalError(t *testing.T) {
 	}
 }
 
+func TestUnprocessedEntity(t *testing.T) {
+	tests := []struct {
+		name string
+		data any
+	}{
+		{"with error string", "validation failed"},
+		{"with validation errors slice", []map[string]string{
+			{"field": "email", "error": "invalid format"},
+			{"field": "age", "error": "must be positive"},
+		}},
+		{"with struct", map[string]string{"field": "email", "error": "invalid format"}},
+		{"with nil", nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			UnprocessedEntity(w, tt.data)
+
+			if w.Code != http.StatusUnprocessableEntity {
+				t.Errorf("status = %d, want 422", w.Code)
+			}
+
+			resp := decodeBody(t, w.Body.Bytes())
+			if resp.Success {
+				t.Error("success should be false for unprocessable entity response")
+			}
+		})
+	}
+}
+
 func TestDecode(t *testing.T) {
 	type payload struct {
 		Name string `json:"name"`

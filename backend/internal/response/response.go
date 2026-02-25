@@ -76,6 +76,10 @@ func InternalError(w http.ResponseWriter, err error) {
 	RespondWithError(w, http.StatusInternalServerError, "An unexpected error occurred")
 }
 
+func UnprocessedEntity(w http.ResponseWriter, err any) {
+	Respond(w, http.StatusUnprocessableEntity, err)
+}
+
 func Decode(r *http.Request, v any) error {
 	return json.NewDecoder(r.Body).Decode(v)
 }
