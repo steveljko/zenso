@@ -33,3 +33,40 @@ func (s *userStore) Create(ctx context.Context, input model.CreateUserInput) err
 
 	return nil
 }
+
+func (s *userStore) GetByID(ctx context.Context, id int) (*model.User, error) {
+	var user model.User
+	err := s.db.GetContext(ctx, &user, `
+		SELECT id, name, email, password, created_at, updated_at
+		FROM users WHERE id = ?`, id,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("getting user by id: %w", err)
+	}
+
+	return &user, nil
+}
+
+func (s *userStore) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	var user model.User
+	err := s.db.GetContext(ctx, &user, `
+		SELECT id, name, email, password, created_at, updated_at
+		FROM users WHERE email = ?`, email,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("getting user by email: %w", err)
+	}
+
+	return &user, nil
+}
+
+func (s *userStore) EmailExists(ctx context.Context, email string) (bool, error) {
+	var exists bool
+	err := s.db.QueryRowContext(ctx, `
+        SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)`, email,
+	).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("checking email existence: %w", err)
+	}
+	return exists, nil
+}

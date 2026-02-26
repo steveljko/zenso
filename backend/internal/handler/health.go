@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"zenso/internal/response"
+	"zenso/internal/json"
 )
 
 type HealthHandler struct {
@@ -13,5 +13,5 @@ func NewHealthHandler() *HealthHandler {
 }
 
 func (h *HealthHandler) Get(w http.ResponseWriter, r *http.Request) {
-	response.OK(w, map[string]string{"status": "ok"})
+	json.OK(w, map[string]string{"status": "ok"})
 }

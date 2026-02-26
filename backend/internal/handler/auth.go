@@ -1,33 +1,46 @@
 package handler
 
 import (
-	"encoding/json"
+	"errors"
 	"net/http"
+	"zenso/internal/json"
 	"zenso/internal/model"
-	"zenso/internal/response"
+	"zenso/internal/service"
 	"zenso/internal/store"
+	"zenso/internal/validator"
 )
 
 type AuthHandler struct {
-	users store.UserStore
+	users       store.UserStore
+	userService service.UserService
 }
 
-func NewAuthHandler(users store.UserStore) *AuthHandler {
-	return &AuthHandler{users: users}
+func NewAuthHandler(users store.UserStore, userService service.UserService) *AuthHandler {
+	return &AuthHandler{users: users, userService: userService}
 }
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var input model.CreateUserInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		response.BadRequest(w, "Invalid request body")
+	if err := json.Decode(r, &input); err != nil {
+		json.BadRequest(w, "Invalid request body")
 		return
 	}
 
-	err := h.users.Create(r.Context(), input)
+	v := validator.New()
+	if errs := v.Validate(input); len(errs) > 0 {
+		json.UnprocessedEntity(w, errs)
+		return
+	}
+
+	user, err := h.userService.CreateUser(r.Context(), input)
 	if err != nil {
-		response.InternalError(w, err)
+		if errors.Is(err, service.ErrEmailTaken) {
+			json.UnprocessedEntity(w, map[string]string{"email": "Email is already in use."})
+			return
+		}
+		json.InternalError(w, err)
 		return
 	}
 
-	response.Created(w, "User created!")
+	json.Created(w, user)
 }
