@@ -3,3 +3,10 @@ declare module '*.html' {
   const content: string;
   export default content;
 }
+
+import type { XButton } from './x-button';
+declare global {
+  interface HTMLElementTagNameMap {
+    'x-button': XButton;
+  }
+}

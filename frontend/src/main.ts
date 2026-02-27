@@ -1,6 +1,7 @@
 import { WindowManager } from './engine';
 import { registerTasks } from './windows/tasks';
 import { createState } from './state';
+import XButton from './components/button';
 
 import './styles/main.css';
 
@@ -19,3 +20,4 @@ const wm = new WindowManager({
 const state = createState();
 
 registerTasks(wm, state);
+customElements.define('x-button', XButton);
