@@ -3,12 +3,14 @@ package config
 import (
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type Config struct {
 	Server ServerConfig
 	DB     DBConfig
+	CORS   CORSConfig
 }
 
 type ServerConfig struct {
@@ -23,6 +25,13 @@ type DBConfig struct {
 	ConnMaxLifetime time.Duration
 }
 
+type CORSConfig struct {
+	AllowedOrigins   []string
+	AllowedMethods   []string
+	AllowedHeaders   []string
+	AllowCredentials string
+}
+
 func Load() *Config {
 	return &Config{
 		Server: ServerConfig{
@@ -35,12 +44,25 @@ func Load() *Config {
 			MaxIdleConns:    getEnvInt("DB_MAX_IDLE_CONNS", 25),
 			ConnMaxLifetime: time.Duration(getEnvInt("DB_CONN_MAX_LIFETIME_MINUTES", 5)) * time.Minute,
 		},
+		CORS: CORSConfig{
+			AllowedOrigins:   getEnvSlice("CORS_ALLOWED_ORIGINS", []string{"http://localhost:5173"}),
+			AllowedMethods:   getEnvSlice("CORS_ALLOWED_METHODS", []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+			AllowedHeaders:   getEnvSlice("CORS_ALLOWED_HEADERS", []string{"Accept", "Authorization", "Content-Type"}),
+			AllowCredentials: getEnv("CORS_ALLOW_CREDENTIALS", "false"),
+		},
 	}
 }
 
 func getEnv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
+	}
+	return fallback
+}
+
+func getEnvSlice(key string, fallback []string) []string {
+	if v := os.Getenv(key); v != "" {
+		return strings.Split(v, ",")
 	}
 	return fallback
 }

@@ -14,6 +14,7 @@ import (
 	"zenso/internal/config"
 	"zenso/internal/db"
 	"zenso/internal/handler"
+	"zenso/internal/middleware"
 	"zenso/internal/store"
 
 	"github.com/jmoiron/sqlx"
@@ -40,7 +41,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Server.Port),
-		Handler:      routes(dbConn),
+		Handler:      routes(dbConn, cfg),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -90,5 +91,5 @@ func routes(db *sqlx.DB) http.Handler {
 
 	mux.HandleFunc("POST /register", authHandler.Register)
 
-	return mux
+	return middleware.HandleCORS(cfg.CORS)(mux)
 }
