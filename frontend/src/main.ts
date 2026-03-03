@@ -1,6 +1,6 @@
 import { WindowManager } from './engine';
-import { registerTasks } from './windows/tasks';
-import { createState } from './state';
+import { registerRegister } from './windows/register';
+import { registerLogin } from './windows/login';
 import XButton from './components/button';
 
 import './styles/main.css';
@@ -17,7 +17,10 @@ const wm = new WindowManager({
   container: document.getElementById('surface') ?? document.body,
 });
 
-const state = createState();
+// const state = createState();
+// registerTasks(wm, state);
 
-registerTasks(wm, state);
+registerRegister(wm);
+registerLogin(wm);
+
 customElements.define('x-button', XButton);

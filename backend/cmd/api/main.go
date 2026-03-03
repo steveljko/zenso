@@ -15,6 +15,8 @@ import (
 	"zenso/internal/db"
 	"zenso/internal/handler"
 	"zenso/internal/middleware"
+	"zenso/internal/service"
+	"zenso/internal/session"
 	"zenso/internal/store"
 
 	"github.com/jmoiron/sqlx"
@@ -79,17 +81,25 @@ func main() {
 }
 
 // routes initializes the internal API router and wires up handlers with their dependencies.
-func routes(db *sqlx.DB) http.Handler {
+func routes(db *sqlx.DB, cfg *config.Config) http.Handler {
+	session := session.New(db.DB, cfg)
+
 	healthHandler := handler.NewHealthHandler()
 
 	userStore := store.NewUserStore(db)
-	authHandler := handler.NewAuthHandler(userStore)
+	userService := service.NewUserService(userStore)
+	authService := service.NewAuthService(userStore)
+
+	authHandler := handler.NewAuthHandler(userStore, userService, authService, session)
 
 	mux := http.NewServeMux()
+	guestMiddleware := middleware.RequireGuest(session)
+	authMiddleware := middleware.RequireAuth(session)
 
 	mux.HandleFunc("GET /health", healthHandler.Get)
 
-	mux.HandleFunc("POST /register", authHandler.Register)
+	mux.Handle("POST /register", guestMiddleware(http.HandlerFunc(authHandler.Register)))
+	mux.Handle("POST /login", authMiddleware(http.HandlerFunc(authHandler.Login)))
 
-	return middleware.HandleCORS(cfg.CORS)(mux)
+	return session.LoadAndSave(middleware.HandleCORS(cfg.CORS)(mux))
 }

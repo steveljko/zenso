@@ -103,7 +103,6 @@ body::before {
   background: var(--surface2);
   border: 1px solid var(--border);
   padding: 0.5rem 0.625rem;
-  font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   color: var(--white);
   outline: none;
@@ -538,8 +537,9 @@ x-button[loading] .button .spinner {
   color: var(--red);
 }
 
-/* Register form */
-.register {
+/* Register/login form */
+.register,
+.login {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -561,7 +561,8 @@ x-button[loading] .button .spinner {
   border-radius: 0.125rem;
 }
 
-.register-form {
+.register-form,
+.login-form {
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
@@ -584,7 +585,6 @@ x-button[loading] .button .spinner {
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
   font-size: 0.688rem;
   font-weight: 500;
   color: var(--mid);

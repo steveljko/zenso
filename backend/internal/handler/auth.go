@@ -6,6 +6,7 @@ import (
 	"zenso/internal/json"
 	"zenso/internal/model"
 	"zenso/internal/service"
+	"zenso/internal/session"
 	"zenso/internal/store"
 	"zenso/internal/validator"
 )
@@ -13,10 +14,23 @@ import (
 type AuthHandler struct {
 	users       store.UserStore
 	userService service.UserService
+	authService service.AuthService
+
+	session *session.Session
 }
 
-func NewAuthHandler(users store.UserStore, userService service.UserService) *AuthHandler {
-	return &AuthHandler{users: users, userService: userService}
+func NewAuthHandler(
+	users store.UserStore,
+	userService service.UserService,
+	authService service.AuthService,
+	session *session.Session,
+) *AuthHandler {
+	return &AuthHandler{
+		users:       users,
+		userService: userService,
+		authService: authService,
+		session:     session,
+	}
 }
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
@@ -43,4 +57,28 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.Created(w, user)
+}
+
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	var input model.UserLoginInput
+	if err := json.Decode(r, &input); err != nil {
+		json.BadRequest(w, "Invalid request body")
+		return
+	}
+
+	v := validator.New()
+	if errs := v.Validate(input); len(errs) > 0 {
+		json.UnprocessedEntity(w, errs)
+		return
+	}
+
+	user, err := h.authService.Authenticate(r.Context(), input)
+	if err != nil {
+		json.InternalError(w, err)
+		return
+	}
+
+	h.session.Put(r.Context(), "USER_ID", user.ID)
+
+	json.OK(w, map[string]*model.User{"ok": user})
 }

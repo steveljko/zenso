@@ -53,6 +53,10 @@ func Load() *Config {
 	}
 }
 
+func (c *Config) IsProd() bool {
+	return c.Server.Env == "production"
+}
+
 func getEnv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
