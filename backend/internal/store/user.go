@@ -34,7 +34,7 @@ func (s *userStore) Create(ctx context.Context, input model.CreateUserInput) err
 	return nil
 }
 
-func (s *userStore) GetByID(ctx context.Context, id int) (*model.User, error) {
+func (s *userStore) GetByID(ctx context.Context, id int64) (*model.User, error) {
 	var user model.User
 	err := s.db.GetContext(ctx, &user, `
 		SELECT id, name, email, password, created_at, updated_at

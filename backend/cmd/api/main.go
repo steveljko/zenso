@@ -99,7 +99,8 @@ func routes(db *sqlx.DB, cfg *config.Config) http.Handler {
 	mux.HandleFunc("GET /health", healthHandler.Get)
 
 	mux.Handle("POST /register", guestMiddleware(http.HandlerFunc(authHandler.Register)))
-	mux.Handle("POST /login", authMiddleware(http.HandlerFunc(authHandler.Login)))
+	mux.Handle("POST /login", guestMiddleware(http.HandlerFunc(authHandler.Login)))
+	mux.Handle("GET /me", authMiddleware(http.HandlerFunc(authHandler.Me)))
 
 	return session.LoadAndSave(middleware.HandleCORS(cfg.CORS)(mux))
 }

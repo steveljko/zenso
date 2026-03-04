@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"zenso/internal/json"
 	"zenso/internal/session"
@@ -12,7 +11,6 @@ func RequireAuth(s *session.Session) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			userID := s.GetInt64(r.Context(), "USER_ID")
-			log.Println(userID)
 			if userID == 0 {
 				json.BadRequest(w, "Unauthorized")
 				return
@@ -27,7 +25,6 @@ func RequireGuest(s *session.Session) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			userID := s.GetInt64(r.Context(), "USER_ID")
-			log.Println(userID)
 			if userID != 0 {
 				json.BadRequest(w, "Already authenticated")
 				return

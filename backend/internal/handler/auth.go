@@ -82,3 +82,15 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	json.OK(w, map[string]*model.User{"ok": user})
 }
+
+func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
+	userID := h.session.GetInt64(r.Context(), "USER_ID")
+
+	user, err := h.users.GetByID(r.Context(), userID)
+	if err != nil {
+		json.InternalError(w, err)
+		return
+	}
+
+	json.OK(w, user)
+}
