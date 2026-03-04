@@ -18,7 +18,6 @@ export class WindowManager {
   }
 
   public register(config: WindowConfig): WindowInstance {
-    config.id = config.id + Math.round(Math.random() * 100);
     if (this.instances.has(config.id)) {
       throw new Error(`Window "${config.id}" is already registered.`);
     }
@@ -55,6 +54,12 @@ export class WindowManager {
     instance.state.isHidden = true;
     updateWindowDOM(instance);
     this.unregister(id);
+  }
+
+  public show(id: string): void {
+    const instance = this.get(id);
+    instance.state.isHidden = false;
+    updateWindowDOM(instance);
   }
 
   public focus(id: string): void {

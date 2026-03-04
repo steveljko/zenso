@@ -182,6 +182,25 @@ describe('WindowManager', () => {
     });
   });
 
+  describe('show', () => {
+    test('sets isHidden to false', () => {
+      const instance = manager.register(makeConfig({ hidden: true }));
+      const id = instance.config.id;
+      manager.show(id);
+      expect(instance.state.isHidden).toBe(false);
+    });
+
+    test('makes window visible in container', () => {
+      const instance = manager.register(makeConfig({ hidden: true }));
+      manager.show(instance.config.id);
+      expect(container.children.length).toBe(1);
+    });
+
+    test('throws for unknown id', () => {
+      expect(() => manager.show('ghost')).toThrow('not found');
+    });
+  });
+
   describe('focus', () => {
     test('increments zIndex on focus', () => {
       const instance = manager.register(makeConfig());
