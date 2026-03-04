@@ -9,18 +9,19 @@ export function registerLogin(wm: WindowManager): void {
   const cy = Math.round((window.innerHeight - H) / 2);
 
   wm.register({
-    id: 'win-register',
+    id: 'login',
     title: 'Login',
     accentColor: 'var(--green)',
     content: html,
     initialPosition: { x: cx, y: cy },
     initialSize: { width: W, height: H },
+    hidden: true,
   });
 
-  initLoginLogic();
+  initLoginLogic(wm);
 }
 
-function initLoginLogic(): void {
+function initLoginLogic(wm: WindowManager): void {
   const root = document.querySelector('.login')!;
 
   const els = {
@@ -57,18 +58,32 @@ function initLoginLogic(): void {
     els.button.setLoading(true);
 
     try {
-      await login(<LoginInput>{
+      const { data } = await login(<LoginInput>{
         email: els.email.value,
         password: els.password.value,
       });
 
-      // TODO: close window, open tasks
+      localStorage.setItem(
+        'zento_liu',
+        JSON.stringify({
+          name: data.ok.name,
+          email: data.ok.email,
+        })
+      );
+
+      setTimeout(() => {
+        wm.close('login');
+        wm.show('tasks');
+      }, 500);
     } catch (err) {
-      const errs = (err as { response: { data: { data: Record<string, string> } } }).response.data
-        .data;
-      setErrors(errs);
-    } finally {
-      setTimeout(() => els.button.setLoading(false), 500);
+      const axiosErr = err as { response?: { data?: { data?: Record<string, string> } } };
+
+      if (axiosErr.response?.data?.data) {
+        setErrors(axiosErr.response.data.data);
+      } else {
+        setErrors({ general: 'Something went wrong. Please try again.' });
+      }
+      els.button.setLoading(false);
     }
   });
 }

@@ -9,12 +9,13 @@ export function registerRegister(wm: WindowManager): void {
   const cy = Math.round((window.innerHeight - H) / 2);
 
   wm.register({
-    id: 'win-register',
+    id: 'register',
     title: 'Create Your Account',
     accentColor: 'var(--blue)',
     content: html,
     initialPosition: { x: cx, y: cy },
     initialSize: { width: W, height: H },
+    hidden: true,
   });
 
   initRegisterLogic();

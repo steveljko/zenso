@@ -5,8 +5,14 @@ export interface Task {
   secs: number;
 }
 
+interface User {
+  name: string;
+  email: string;
+}
+
 export interface AppState {
   tasks: Task[];
+  user: User;
   save(): void;
 }
 
@@ -18,6 +24,7 @@ function loadState(): Omit<AppState, 'save'> {
 
   return {
     tasks: [],
+    user: { name: '', email: '' },
   };
 }
 

@@ -4,10 +4,11 @@ import html from './index.html';
 
 export function registerTasks(wm: WindowManager, state: AppState): void {
   wm.register({
-    id: 'win-tasks',
+    id: 'tasks',
     title: 'Tasks',
     accentColor: 'var(--red)',
     content: html,
+    hidden: true,
   });
 
   initTasksLogic(state);
